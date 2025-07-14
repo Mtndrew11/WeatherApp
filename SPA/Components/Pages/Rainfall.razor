@@ -1,0 +1,83 @@
+﻿@page "/rainfall"
+@attribute [StreamRendering]
+@using Newtonsoft.Json;
+@using SPA.Models;
+@inject IConfiguration Configuration
+
+<!---------- CODE ---------->
+
+@code {
+    private List<RainfallModel> DailyRainfall = new();
+    private List<RainfallModel> History = new();
+    private List<RainfallModel> Forecast = new();
+    private string apiKey;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the API key from appsettings.json
+        apiKey = Configuration["MySecretApiKey"];
+
+        // Build the function URL with the API key
+        string functionUrl = $"https://weather0120250711195926.azurewebsites.net/api/GetWeatherData?code={apiKey}";
+
+        using var client = new HttpClient();
+        var response = await client.GetAsync(functionUrl);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var apiContent = await response.Content.ReadAsStringAsync();
+            // Assuming the API returns: { "DailyRainfall": [ ... ] }
+            var obj = JsonConvert.DeserializeObject<dynamic>(apiContent);
+            DailyRainfall = JsonConvert.DeserializeObject<List<RainfallModel>>(Convert.ToString(obj.DailyRainfall));
+
+            History = DailyRainfall.Where(r => r.Type == "history").OrderBy(r => r.Date).ToList();
+            Forecast = DailyRainfall.Where(r => r.Type == "forecast").OrderBy(r => r.Date).ToList();
+        }
+    }
+}
+
+<!---------- HTML ---------->
+<PageTitle>Weather</PageTitle>
+<h1>Rainfall Summary</h1>
+@if (DailyRainfall == null || !DailyRainfall.Any())
+{
+    <p>Loading Data...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th colspan="2">Past 7 Days</th>
+                <th colspan="2">Next 7 Days</th>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <th>Amount (in)</th>
+                <th>Date</th>
+                <th>Amount (in)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Math.Max(History.Count, Forecast.Count); i++)
+            {
+                <tr>
+                    <td>@(i < History.Count ? History[i].Date.ToString("M-d") : "")</td>
+                    <td>@(i < History.Count ? History[i].Rain.ToString("0.00") : "")</td>
+                    <td>@(i < Forecast.Count ? Forecast[i].Date.ToString("M-d") : "")</td>
+                    <td>@(i < Forecast.Count ? Forecast[i].Rain.ToString("0.00") : "")</td>
+                </tr>
+            }
+            <tr class="fw-bold">
+                <td>Total</td>
+                <td>@History.Sum(r => r.Rain).ToString("0.00")</td>
+                <td>Total</td>
+                <td>@Forecast.Sum(r => r.Rain).ToString("0.00")</td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+@code {
+
+}

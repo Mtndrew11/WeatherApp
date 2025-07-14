@@ -1,0 +1,73 @@
+﻿@page "/weather"
+@attribute [StreamRendering]
+@using Newtonsoft.Json;
+@using SPA.Models;
+@inject IConfiguration Configuration
+
+<!---------- CODE ---------->
+@code {
+
+    private string API_Content = null;
+    private string response = null;
+    private WeatherModel WeatherModelData = null;
+    private string apiKey;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the API key from appsettings.json
+        apiKey = Configuration["MySecretApiKey"];
+
+        // Build the function URL with the API key
+        string functionUrl = $"https://weather0120250711195926.azurewebsites.net/api/GetWeatherData?code={apiKey}";
+
+        using (var httpClient = new HttpClient())
+        {
+            var response = await httpClient.GetAsync(functionUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                API_Content = await response.Content.ReadAsStringAsync();
+                WeatherModelData = Newtonsoft.Json.JsonConvert.DeserializeObject<WeatherModel>(API_Content);
+            }
+            else
+            {
+                API_Content = "Error fetching data from Azure Function.";
+            }
+        }
+    }
+}
+
+<!---------- HTML ---------->
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+@if (WeatherModelData == null)
+{
+    <p>Loading Data...</p>
+}
+else
+{
+    <table>
+        <tr>
+            <td><b>Date:</b></td>
+            <td>@WeatherModelData.Date</td>
+        </tr>
+        <tr>
+            <td><b>Rainfall (Last 7 Days):</b></td>
+            <td>@WeatherModelData.RainfallLast7Days</td>
+        </tr>
+        <tr>
+            <td><b>Rainfall (Next 7 Days):</b></td>
+            <td>@WeatherModelData.RainfallNext7Days</td>
+        </tr>
+        <tr>
+            <td><b>Avg Temps (Next 7 Days):</b></td>
+            <td>@WeatherModelData.MaxTempNext7DayAvg</td>
+        </tr>
+        <tr>
+            <td><b>Soil Temp (Avg Last 3 Days):</b></td>
+            <td>@WeatherModelData.SoilTempAvgLast3Days</td>
+        </tr>
+    </table>
+
+}
