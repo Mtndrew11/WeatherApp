@@ -32,9 +32,7 @@ jobs:
       - name: 'Resolve Project Dependencies Using Dotnet'
         shell: pwsh
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output ./output
-          popd
+          dotnet build WeatherApp/WeatherApp.csproj --configuration Release --output WeatherApp/WeatherApp/output
       
       - name: Login to Azure
         uses: azure/login@v2
