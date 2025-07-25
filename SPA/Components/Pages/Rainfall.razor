@@ -11,14 +11,17 @@
     private List<RainfallModel> History = new();
     private List<RainfallModel> Forecast = new();
     private string apiKey;
+    private string functionUrl;
 
     protected override async Task OnInitializedAsync()
     {
-        // Get the API key from appsettings.json
-        apiKey = Configuration["MySecretApiKey"];
+
+        var apiKey = Configuration["FunctionApiKey"];
+        var baseUrl = Configuration["FunctionUrl"];
+        var functionUrl = $"{baseUrl}?code={apiKey}";
 
         // Build the function URL with the API key
-        string functionUrl = $"https://weather0120250711195926.azurewebsites.net/api/GetWeatherData?code={apiKey}";
+        //string functionUrl = $"https://weather0120250711195926.azurewebsites.net/api/GetWeatherData?code={apiKey}";
 
         using var client = new HttpClient();
         var response = await client.GetAsync(functionUrl);

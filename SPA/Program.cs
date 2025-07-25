@@ -10,7 +10,12 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // Add this to load appsettings.json
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+//builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+//Load config from root folder
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
 
 // Register configuration for DI
 builder.Services.AddSingleton(builder.Configuration);
