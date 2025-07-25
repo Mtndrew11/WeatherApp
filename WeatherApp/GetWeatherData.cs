@@ -41,17 +41,7 @@ namespace WeatherApp
         //private static readonly string apiUrl1 = "https://api.open-meteo.com/v1/forecast?latitude=38.6&longitude=77.34&hourly=precipitation&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch";
         //private static readonly string rainfallHistory_URL = "https://archive-api.open-meteo.com/v1/archive?latitude=38.6&longitude=77.34&start_date=2024-07-13&end_date=2024-07-27&hourly=rain&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch";
         
-        [FunctionName("TestFunction01")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
-        {
-            string startDate = DateTime.Now.AddDays(-8).ToString("yyyy-MM-dd");
-            log.LogInformation($"Test function started: {startDate}");
-            return new OkObjectResult($"TestFunction01 executed successfully: {startDate}");
-        }
-
-            [FunctionName("GetWeatherData")]
+        [FunctionName("GetWeatherData")]
         public static async Task<IActionResult> RunGetWeatherData(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
