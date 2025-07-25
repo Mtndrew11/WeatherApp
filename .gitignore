@@ -31,3 +31,5 @@ WeatherApp/Properties/ServiceDependencies
 
 SPA/local.settings.json
 SPA/local.settings.Development.json
+SPA/appsettings.local.json
+SPA/appsettings.Development.json
